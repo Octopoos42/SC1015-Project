@@ -1,1 +1,192 @@
+import pandas
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+from sklearn.linear_model import LinearRegression
 
+# Goal of this project:
+# I want to figure out how much should a graduate be paid, based on their productivity
+# Then find out if their predicted wages match up to their actual wages
+
+# Time to prepare my Wages Data Set
+
+# Obtaining the data for wages
+wages_df = pd.read_csv("wages.csv")
+
+# Focusing only on the 3 rows of data we are interested in
+wages_df = pd.DataFrame(wages_df.iloc[9:11])
+
+# Making the data labels into column names instead of row names
+wages_df = wages_df.transpose()
+
+# Dropping a redundant column "Unnamed"
+wages_df = wages_df.reset_index(drop=True)
+
+# Renaming the columns for better readability
+wages_df = wages_df.set_axis(['Year', 'Median Monthly Income'], axis='columns')
+
+# Dropping the duplicate column names
+wages_df = wages_df.drop(index=0)
+
+# Standardising all data values into integers
+wages_df = wages_df.astype(int)
+wages_df = wages_df.sort_values(by='Year')
+# Sanity check
+print(wages_df)
+
+# Time to Prepare my Productivity Data Set
+
+# Obtaining the data for productivity
+productivity_df = pd.read_csv("productivity.csv")
+
+# Focusing on the actual data in the file
+productivity_df = pd.DataFrame(productivity_df.iloc[9:11])
+
+# Making the data labels into column names instead of row names
+productivity_df = productivity_df.transpose()
+
+# Dropping a redundant column "Unnamed"
+productivity_df = productivity_df.reset_index()
+
+# Renaming the columns for better readability
+productivity_df = productivity_df.set_axis(['Annual', 'Quarterly', 'Composite Leading Index'], axis='columns')
+
+# Dropping the duplicate column names
+productivity_df = productivity_df.drop(index=0)
+
+# Sanity check
+print(productivity_df)
+
+# Inputting the years into the empty Annual Column
+for n in range(1, len(productivity_df), 4):
+    productivity_df['Annual'][n-1:n+3] = int(2022 - (n-1)/4)
+
+# Prepping the Composite Leading Index Column as float values for mean calculation
+productivity_df['Composite Leading Index'] = productivity_df['Composite Leading Index'].astype(float)
+
+# Sanity check
+print(productivity_df)
+
+# Creating a new DataFrame to hold the mean values of productivity
+prod_annual = productivity_df.groupby('Annual')
+prod_annual = prod_annual.size().to_frame(name='counts').join(prod_annual.agg({'Composite Leading Index': 'mean'}).rename(columns={'Composite Leading Index': 'Annual Composite Leading Index'}))
+prod_annual = prod_annual.reset_index()
+prod_annual = pd.DataFrame(prod_annual)
+
+# Renaming the columns and dropping the redundant Count Column for better readability
+prod_annual = prod_annual.rename(columns={"Annual": "Year"})
+prod_annual = prod_annual.drop(columns=['counts'])
+
+# Sanity Check
+print(prod_annual)
+
+# Obtaining the data for graduates
+graduates_df = pd.read_csv("graduates.csv")
+
+# Focusing only on the rows of data we are interested in
+graduates_df = pd.DataFrame(graduates_df.iloc[9:42])
+
+# Making the data labels into column names instead of row names
+graduates_df = graduates_df.transpose()
+
+# Dropping a redundant column "Unnamed"
+graduates_df = graduates_df.reset_index(drop=True)
+
+# Renaming the columns for better readability and dropping duplicate names
+graduates_df = graduates_df.set_axis(graduates_df.iloc[0], axis='columns')
+graduates_df = graduates_df.rename(columns={"Data Series": "Year"})
+graduates_df = graduates_df.drop(index=0)
+print(graduates_df)
+
+# Filling the missing data with 0
+graduates_df = graduates_df.replace('na', 0)
+
+# Standardising all values to be of integer values
+graduates_df = graduates_df.astype(int)
+graduates_df.sort_values(by='Year')
+# Sanity check
+print(graduates_df)
+
+# Time to do some data analysis
+
+# First, we need to merge all 3 data sets into one for convenience
+# It also conveniently picks the subset of years that exist on all 3 data sets
+data = pd.merge(prod_annual, wages_df, on='Year')
+data = pd.merge(graduates_df, data, on='Year')
+print(data)
+
+# Labelling the relevant variables for future analysis
+productivity = data['Annual Composite Leading Index']
+wages = data['Median Monthly Income']
+year = data['Year']
+male_graduates = data['Males']
+female_graduates = data['Females']
+
+# Let's find what is the relationship between wages and productivity
+
+fig, axs = plt.subplots(1, 2, figsize=(10, 5))
+# Plot the first scatterplot in the first subplot
+sns.lineplot(y=productivity, x=year, ax=axs[0])
+axs[0].set_title('Productivity Over Time')
+
+# Plot the second scatterplot in the second subplot
+sns.lineplot(y=wages, x=year, ax=axs[1])
+axs[1].set_title('Wages Over Time')
+plt.show()
+
+# predicting variable will be productivity, and predicted variable will be wages
+sns.jointplot(x= productivity, y= wages, kind="reg")
+plt.show()
+
+# Perform regression analysis
+X = data[['Females', 'Males']]
+y = productivity
+X = (X - X.mean()) / X.std()
+reg = LinearRegression().fit(X, y)
+print("Coefficients:\n[Female Graduates | Male Graduates]\n", reg.coef_)
+
+# Interpret the results
+if reg.coef_[0] > reg.coef_[1]:
+    print("Female graduates have a bigger impact on the labour market.")
+else:
+    print("Male graduates have a bigger impact on the labour market.")
+fig, axs = plt.subplots(1, 2, figsize=(10, 5))
+# Plot the first scatterplot in the first subplot
+sns.lineplot(y=productivity, x=female_graduates, ax=axs[0])
+axs[0].set_title('Female impact')
+
+# Plot the second scatterplot in the second subplot
+sns.lineplot(y=productivity, x=male_graduates, ax=axs[1])
+axs[1].set_title('Male impact')
+plt.show()
+
+fig, axs = plt.subplots(1, 2, figsize=(10, 5))
+
+# Plot the first scatterplot in the first subplot
+sns.lineplot(y=female_graduates, x=year, ax=axs[0])
+axs[0].set_title('Number of Female Graduates')
+
+# Plot the second scatterplot in the second subplot
+sns.lineplot(y=male_graduates, x=year, ax=axs[1])
+axs[1].set_title('Number of Male Graduates')
+plt.show()
+
+from sklearn.model_selection import KFold
+
+X = data[['Females', 'Males']]
+y = productivity
+
+kf = KFold(n_splits=5, shuffle=True, random_state=42)
+
+for train_index, test_index in kf.split(X):
+    X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+    y_train, y_test = y.iloc[train_index], y.iloc[test_index]
+
+    # Perform regression analysis on the training set
+    reg = LinearRegression().fit(X_train, y_train)
+
+    # Evaluate the model on the testing set
+    score = reg.score(X_test, y_test)
+
+    print(f"R^2 score: {score:.2f}")
