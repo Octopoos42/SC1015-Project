@@ -1,4 +1,3 @@
-import pandas
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -141,6 +140,71 @@ plt.show()
 # predicting variable will be productivity, and predicted variable will be wages
 sns.jointplot(x= productivity, y= wages, kind="reg")
 plt.show()
+
+# Perform regression analysis
+X = productivity.values.reshape(-1,1)
+y = wages
+X = (X - X.mean()) / X.std()
+model = LinearRegression().fit(X, y)
+print("\nCoefficients:\n[Productivity as predictor & Wages as predictand: ", model.coef_)
+
+# START OF TRAINING DATASET TO PREDICT WAGES BASED ON PRODUCTIVITY
+
+# Create empty lists to store RMSE and R2 scores for each fold
+rmse_wages_list = []
+r2_wages_list = []
+
+kf = KFold(n_splits=5, shuffle=True, random_state=42)
+f, axes = plt.subplots(5, 2, figsize=(18, 24))
+count = 0
+
+for train_index, test_index in kf.split(X):
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y.iloc[train_index], y.iloc[test_index]
+
+    # Perform regression analysis on the training set
+    model_wages = LinearRegression()
+    model_wages = model_wages.fit(X_train, y_train)
+
+    # Predict productivity for the testing data
+    y_pred_test = model_wages.predict(X_test)
+
+    y_pred_train = model_wages.predict(X_train)
+
+    # Evaluate the model on the testing set
+    r2_wages = model_wages.score(X_test, y_test)
+
+    print(f"\nR^2 score: {r2_wages:.2f}")
+
+    # Calculate the mean squared error for this fold
+    mse_wages = mean_squared_error(y_test, y_pred_test)
+    rmse_wages = np.sqrt(mse_wages)
+
+    # Append RMSE and R2 scores to the lists
+    rmse_wages_list.append(rmse_wages)
+    r2_wages_list.append(r2_wages)
+
+    # Calculate the average RMSE and R2 score
+    rmse_ave = np.mean(rmse_wages_list)
+    score_ave = np.mean(r2_wages_list)
+
+    # Print the mean squared error for this fold
+    print("Root Mean Squared Error:", rmse_wages.round(2))
+
+    sns.regplot(x=X_train, y=y_train, label='Train', ax=axes[count, 0])
+    sns.regplot(x=X_test, y=y_test, label='Test', ax=axes[count, 1])
+
+    axes[count, 0].set_xlabel('Productivity vs Wages (Train)')
+    axes[count, 1].set_xlabel('Productivity vs Wages (Test)')
+    count += 1
+
+print("\nGoodness of Fit of Productivity against Wages:")
+print("Average Explained Variance (R^2) \t:", score_ave.round(2))
+print("Average Root Mean Squared Error (RMSE) \t: $", rmse_ave.round(2), sep='')
+
+# THIS IS THE END FOR PRODUCTIVITY VS WAGES
+
+# THIS IS THE START FOR GRADUATE PROFILE VS PRODUCTIVITY
 
 fig, axs = plt.subplots(1, 2, figsize=(10, 5))
 
