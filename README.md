@@ -23,9 +23,10 @@ Contents:
 ## Aim
 - To investigate the relationship between total number of graduates, productivity and wages, and to determine if there is a causal relationship between these variables.
 
-## Model Used
+## Models Used
 
 1. Linear Regression
+2. Mediation Analysis
 
 ## Conclusion
 
