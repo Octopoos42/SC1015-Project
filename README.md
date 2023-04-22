@@ -17,23 +17,19 @@ Contents:
 
 ## Problem Definition
 
-Research Question:
-- Are we able to predict if a movie is good (rating above 7.2) based on its attributes?
-- Which model would be the best to predict it?
+- What is the relationship between total number of graduates and wages in the context of productivity?
+- How does productivity contribute to this relationship?
 
-## Models Used
+## Aim
+- To investigate the relationship between total number of graduates, productivity and wages, and to determine if there is a causal relationship between these variables.
 
-1. Logistic Regression
-2. Neural Networks
+## Model Used
+
+1. Linear Regression
 
 ## Conclusion
 
-- Popularity and budget have low linear correlation value with ratings (watch out for bandwagons 🤣)
-- Popularity of the casts and crews have higher linear correlation value with ratings
-- Resampling imbalanced data improved model performance especially on the minority class
-- Logistic Regression did not perform well with non-linearly correlated variables
-- Neural Networks along with SMOTEENN resampling method consistently did well in predicting good movies after 100 training attempts (around 72% accuracy, 70% recall)
-- Yes, it is possible to predict if a movie is good with acceptable amount of accuracy and recall
+- 
 
 ## What did we learn from this project?
 
