@@ -51,3 +51,4 @@ Contents:
 - <https://tablebuilder.singstat.gov.sg/table/TS/M850511>
 - <https://www.channelnewsasia.com/singapore/graduate-salaries-2022-hiring-jobs-employees-work-3338911>
 - <https://www.moe.gov.sg/-/media/files/post-secondary/ges-2022/joint-web-publication-4-aus-ges2022.ashx>
+- <https://data.library.virginia.edu/introduction-to-mediation-analysis/>
