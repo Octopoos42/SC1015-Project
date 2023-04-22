@@ -34,7 +34,7 @@ Contents:
 - Model 2: Strong linear correlation between Predictor and Mediator
 - Model 3: Strong linear correlation between Predictor, Mediator and Predictand
 - Leave-one-out Cross Validation has proven to help produce accurate and precise prediciton models
-- Productivity is complex and not easily quantifiable, which may have led to misleading conclusions of our mediation analysis
+- Productivity is complex and not easily quantifiable, which may prompts further analysis of our conclusions
 
 ## What did we learn from this project?
 
