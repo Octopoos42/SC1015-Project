@@ -34,7 +34,7 @@ Contents:
 - Model 2: Strong linear correlation between Predictor and Mediator
 - Model 3: Strong linear correlation between Predictor, Mediator and Predictand
 - Leave-one-out Cross Validation has proven to help produce accurate and precise prediciton models
-- Productivity is complex and not easily quantifiable, which may prompts further analysis of our conclusions
+- Productivity is complex and not easily quantifiable, which may prompt further analysis of our conclusions
 
 ## What did we learn from this project?
 
@@ -49,3 +49,5 @@ Contents:
 - <https://tablebuilder.singstat.gov.sg/table/TS/M182981>
 - <https://tablebuilder.singstat.gov.sg/table/TS/M240421>
 - <https://tablebuilder.singstat.gov.sg/table/TS/M850511>
+- <https://www.channelnewsasia.com/singapore/graduate-salaries-2022-hiring-jobs-employees-work-3338911>
+- <https://www.moe.gov.sg/-/media/files/post-secondary/ges-2022/joint-web-publication-4-aus-ges2022.ashx>
